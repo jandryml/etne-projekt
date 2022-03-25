@@ -1,31 +1,26 @@
 package com.etnetera.hr.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.etnetera.hr.data.JavaScriptFramework;
+import com.etnetera.hr.service.JavaScriptFrameworkService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.etnetera.hr.data.JavaScriptFramework;
-import com.etnetera.hr.repository.JavaScriptFrameworkRepository;
-
 /**
  * Simple REST controller for accessing application logic.
- * 
- * @author Etnetera
  *
+ * @author Etnetera
  */
+
 @RestController
+@RequiredArgsConstructor
 public class JavaScriptFrameworkController {
 
-	private final JavaScriptFrameworkRepository repository;
+    private final JavaScriptFrameworkService javaScriptFrameworkService;
 
-	@Autowired
-	public JavaScriptFrameworkController(JavaScriptFrameworkRepository repository) {
-		this.repository = repository;
-	}
-
-	@GetMapping("/frameworks")
-	public Iterable<JavaScriptFramework> frameworks() {
-		return repository.findAll();
-	}
+    @GetMapping("/frameworks")
+    public Iterable<JavaScriptFramework> frameworks() {
+        return javaScriptFrameworkService.findAll();
+    }
 
 }

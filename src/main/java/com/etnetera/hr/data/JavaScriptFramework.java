@@ -1,5 +1,7 @@
 package com.etnetera.hr.data;
 
+import lombok.*;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +14,11 @@ import javax.persistence.Id;
  * @author Etnetera
  *
  */
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
+@NoArgsConstructor
 public class JavaScriptFramework {
 
 	@Id
@@ -22,26 +28,7 @@ public class JavaScriptFramework {
 	@Column(nullable = false, length = 30)
 	private String name;
 
-	public JavaScriptFramework() {
-	}
-
 	public JavaScriptFramework(String name) {
-		this.name = name;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -49,5 +36,4 @@ public class JavaScriptFramework {
 	public String toString() {
 		return "JavaScriptFramework [id=" + id + ", name=" + name + "]";
 	}
-
 }

@@ -1,17 +1,22 @@
 package com.etnetera.hr;
 
+import com.etnetera.hr.data.JavaScriptFramework;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * Class used for Spring Boot/MVC based tests.
- * 
- * @author Etnetera
  *
+ * @author Etnetera
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class JavaScriptFrameworkTests {
-
+    @Test
+    public void test() {
+        JavaScriptFramework framework = new JavaScriptFramework("Test");
+        System.out.println(framework);
+    }
 }
