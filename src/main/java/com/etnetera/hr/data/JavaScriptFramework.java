@@ -2,15 +2,12 @@ package com.etnetera.hr.data;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * Simple data entity describing basic properties of every JavaScript framework.
- * 
+ *
  * @author Etnetera
  *
  */
@@ -27,6 +24,9 @@ public class JavaScriptFramework {
 
 	@Column(nullable = false, length = 30)
 	private String name;
+
+	@OneToMany(mappedBy = "framework")
+	private List<JavaScriptFrameworkVersion> versions;
 
 	public JavaScriptFramework(String name) {
 		this.name = name;
