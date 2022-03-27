@@ -1,6 +1,7 @@
 package com.etnetera.hr.data;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,11 +12,10 @@ import java.util.List;
  * @author Etnetera
  *
  */
-@Getter
-@Setter
-@EqualsAndHashCode
-@Entity
+@Data
+@Accessors(chain = true)
 @NoArgsConstructor
+@Entity
 public class JavaScriptFramework {
 
 	@Id
@@ -27,10 +27,6 @@ public class JavaScriptFramework {
 
 	@OneToMany(mappedBy = "framework")
 	private List<JavaScriptFrameworkVersion> versions;
-
-	public JavaScriptFramework(String name) {
-		this.name = name;
-	}
 
 	@Override
 	public String toString() {

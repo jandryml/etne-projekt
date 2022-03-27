@@ -1,18 +1,15 @@
 package com.etnetera.hr.data;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@Entity
+@Data
+@Accessors(chain = true)
 @NoArgsConstructor
+@Entity
 public class JavaScriptFrameworkVersion {
 
     @Id
