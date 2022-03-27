@@ -34,18 +34,17 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
     }
 
     @Override
-    public JavaScriptFrameworkPlainResponse create(JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
+    public JavaScriptFrameworkPlainResponse create(JavaScriptFrameworkPlainRequest plainRequest) {
         return null;
     }
 
     @Override
-    public JavaScriptFrameworkPlainResponse update(JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
+    public JavaScriptFrameworkPlainResponse update(JavaScriptFrameworkPlainRequest plainRequest) {
         return null;
     }
 
     @Override
-    public JavaScriptFrameworkPlainResponse updateDeprecationDateAndHypeLevel(String name, String version, JavaScriptFrameworkDataPatchRequest javaScriptFrameworkDataPatchRequest) {
-
+    public JavaScriptFrameworkPlainResponse updateDeprecationDateAndHypeLevel(String name, String version, JavaScriptFrameworkDataPatchRequest dataPatchRequest) {
         return null;
     }
 

@@ -13,14 +13,14 @@ public interface JavaScriptFrameworkService {
 
     JavaScriptFrameworkPlainResponse findByNameAndVersion(String name, String version);
 
-    JavaScriptFrameworkPlainResponse create(JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest);
+    JavaScriptFrameworkPlainResponse create(JavaScriptFrameworkPlainRequest plainRequest);
 
-    JavaScriptFrameworkPlainResponse update(JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest);
+    JavaScriptFrameworkPlainResponse update(JavaScriptFrameworkPlainRequest plainRequest);
 
     JavaScriptFrameworkPlainResponse updateDeprecationDateAndHypeLevel(
             String name,
             String version,
-            JavaScriptFrameworkDataPatchRequest javaScriptFrameworkDataPatchRequest);
+            JavaScriptFrameworkDataPatchRequest dataPatchRequest);
 
     void deleteByName(String name);
 
