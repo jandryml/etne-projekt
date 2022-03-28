@@ -1,7 +1,6 @@
 package com.etnetera.hr.service.impl;
 
 import com.etnetera.hr.data.JavaScriptFramework;
-import com.etnetera.hr.data.JavaScriptFrameworkVersion;
 import com.etnetera.hr.dto.mapper.JavaScriptFrameworkMapper;
 import com.etnetera.hr.dto.request.JavaScriptFrameworkDataPatchRequest;
 import com.etnetera.hr.dto.request.JavaScriptFrameworkPlainRequest;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,70 +32,57 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
 
     @Override
     public List<JavaScriptFrameworkWithVersionsResponse> findAll() {
-        return mapper.toJavaScriptFrameworkWithVersionsResponse(javaScriptFrameworkRepository.findAll());
+        return javaScriptFrameworkRepository.findAll().stream()
+                .map(mapper::toJavaScriptFrameworkWithVersionsResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public JavaScriptFrameworkWithVersionsResponse findByName(String name) {
-        return mapper.toJavaScriptFrameworkWithVersionsResponse(
-                javaScriptFrameworkRepository.findByName(name)
-                        .orElseThrow(() -> new ResourceNotFoundException("Resource not found")));
+        return javaScriptFrameworkRepository.findByName(name)
+                .map(mapper::toJavaScriptFrameworkWithVersionsResponse)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("JavaScript framework with name %s not found", name)));
     }
 
     @Override
     public JavaScriptFrameworkPlainResponse findByNameAndVersion(String name, String version) {
-        return mapper.toJavaScriptFrameworkPlainResponse(
-                javaScriptFrameworkVersionRepository.findByFrameworkNameAndVersion(name, version)
-                        .orElseThrow(() -> new ResourceNotFoundException("Resource not found")));
+        return javaScriptFrameworkVersionRepository.findByFrameworkNameAndVersion(name, version)
+                .map(mapper::toJavaScriptFrameworkPlainResponse)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("JavaScript framework with name %s and version %s not found", name, version)));
     }
 
     @Override
     public JavaScriptFrameworkWithVersionsResponse create(JavaScriptFrameworkPlainRequest plainRequest) {
+        // verify that framework with same name and version doesn't exist
         javaScriptFrameworkVersionRepository
                 .findByFrameworkNameAndVersion(plainRequest.getName(), plainRequest.getVersion())
                 .ifPresent(it -> {
-                    throw new ResourceAlreadyExistsException("JavaScript framework exists");
+                    throw new ResourceAlreadyExistsException(String.format("JavaScript framework with name %s and version %s not found", plainRequest.getName(), plainRequest.getVersion()));
                 });
 
-        // issue with returning iterable
+        // try to find framework by name to prevent framework names duplications
         var framework = javaScriptFrameworkRepository.findByName(plainRequest.getName())
+                // if not found, create new
                 .orElse(new JavaScriptFramework().setName(plainRequest.getName()));
 
-        var frameworkVersion = mapper.toJavaScriptFrameworkVersion(plainRequest).setFramework(framework);
+        // add new version of framework
+        framework.getVersions().add(mapper.toJavaScriptFrameworkVersion(plainRequest).setFramework(framework));
+        javaScriptFrameworkRepository.save(framework);
 
-        javaScriptFrameworkVersionRepository.save(frameworkVersion);
-
-        framework.getVersions().add(frameworkVersion);
-
-        return mapper.toJavaScriptFrameworkWithVersionsResponse(frameworkVersion.getFramework());
+        return mapper.toJavaScriptFrameworkWithVersionsResponse(framework);
     }
 
     @Override
-    //TODO remove
-    public JavaScriptFrameworkWithVersionsResponse update(JavaScriptFrameworkPlainRequest plainRequest) {
-        var javaScriptFrameworkVersion = javaScriptFrameworkVersionRepository
-                .findByFrameworkNameAndVersion(plainRequest.getName(), plainRequest.getVersion())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(String.format("JavaScript framework with name %s not found", plainRequest.getName())));
-
-        javaScriptFrameworkVersionRepository.save(
-                updateJavaScriptFrameworkVersion(
-                        javaScriptFrameworkVersion, plainRequest.getDeprecationDate(), plainRequest.getHypeLevel()
-                ));
-
-        return mapper.toJavaScriptFrameworkWithVersionsResponse(javaScriptFrameworkVersion.getFramework());
-    }
-
-    @Override
-    public JavaScriptFrameworkWithVersionsResponse updateDeprecationDateAndHypeLevel(
-            String name, String version, JavaScriptFrameworkDataPatchRequest dataPatchRequest) {
+    public JavaScriptFrameworkWithVersionsResponse updateDeprecationDateAndHypeLevel(String name, String version,
+                                                                                     JavaScriptFrameworkDataPatchRequest dataPatchRequest) {
         var fetchedValue = javaScriptFrameworkVersionRepository.findByFrameworkNameAndVersion(name, version)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("JavaScript framework with name %s and version %s not found", name, version)));
 
         javaScriptFrameworkVersionRepository.save(
-                updateJavaScriptFrameworkVersion(
-                        fetchedValue, dataPatchRequest.getDeprecationDate(), dataPatchRequest.getHypeLevel()
-                ));
+                fetchedValue
+                        .setDeprecationDate(LocalDate.parse(dataPatchRequest.getDeprecationDate()))
+                        .setHypeLevel(dataPatchRequest.getHypeLevel())
+        );
 
         return mapper.toJavaScriptFrameworkWithVersionsResponse(fetchedValue.getFramework());
     }
@@ -107,12 +94,6 @@ public class JavaScriptFrameworkServiceImpl implements JavaScriptFrameworkServic
 
     @Override
     public void deleteByNameAndVersion(String name, String version) {
-        javaScriptFrameworkRepository.deleteById(findByNameAndVersion(name, version).getId());
-    }
-
-    private JavaScriptFrameworkVersion updateJavaScriptFrameworkVersion(JavaScriptFrameworkVersion frameworkVersion, String deprecationDate, int hypeLevel) {
-        frameworkVersion.setDeprecationDate(LocalDate.parse(deprecationDate));
-        frameworkVersion.setHypeLevel(hypeLevel);
-        return frameworkVersion;
+        javaScriptFrameworkVersionRepository.deleteById(findByNameAndVersion(name, version).getId());
     }
 }

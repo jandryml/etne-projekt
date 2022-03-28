@@ -42,18 +42,10 @@ public class JavaScriptFrameworkController {
         return javaScriptFrameworkService.findByNameAndVersion(name, version);
     }
 
-    @PutMapping
-    public ResponseEntity<JavaScriptFrameworkWithVersionsResponse> save(@Valid @RequestBody JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
-        JavaScriptFrameworkWithVersionsResponse result;
-        HttpStatus httpStatus;
-        try {
-            result = javaScriptFrameworkService.update(javaScriptFrameworkPlainRequest);
-            httpStatus = HttpStatus.OK;
-        } catch (ResourceNotFoundException e) {
-            result = javaScriptFrameworkService.create(javaScriptFrameworkPlainRequest);
-            httpStatus = HttpStatus.CREATED;
-        }
-        return ResponseEntity.status(httpStatus).body(result);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public JavaScriptFrameworkWithVersionsResponse create(@Valid @RequestBody JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
+        return javaScriptFrameworkService.create(javaScriptFrameworkPlainRequest);
     }
 
     @PatchMapping("/{name}/{version}")
@@ -73,5 +65,4 @@ public class JavaScriptFrameworkController {
     public void deleteByNameAndVersion(@PathVariable String name, @PathVariable String version) {
         javaScriptFrameworkService.deleteByNameAndVersion(name, version);
     }
-
 }

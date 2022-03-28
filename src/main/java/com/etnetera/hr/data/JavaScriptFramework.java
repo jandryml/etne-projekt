@@ -26,7 +26,7 @@ public class JavaScriptFramework {
 	@Column(nullable = false, length = 30)
 	private String name;
 
-	@OneToMany(mappedBy = "framework"/*, cascade = CascadeType.ALL*/)
+	@OneToMany(mappedBy = "framework", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<JavaScriptFrameworkVersion> versions = new ArrayList<>();
 
 	@Override

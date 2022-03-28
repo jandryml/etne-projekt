@@ -51,15 +51,6 @@ public interface JavaScriptFrameworkService {
     /**
      * Updates JavaScript framework with given name and version
      *
-     * @param plainRequest must not be null and be valid
-     * @return updated JavaScript framework
-     * @throws ResourceNotFoundException if a JavaScript framework with this name and version not found
-     */
-    JavaScriptFrameworkWithVersionsResponse update(@NotNull @Valid JavaScriptFrameworkPlainRequest plainRequest) throws ResourceNotFoundException;
-
-    /**
-     * Updates JavaScript framework with given name and version
-     *
      * @param name name of JavaScript framework
      * @param version version of JavaScript framework
      * @param dataPatchRequest must not be null and be valid

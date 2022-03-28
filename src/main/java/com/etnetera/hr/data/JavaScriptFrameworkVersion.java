@@ -16,7 +16,7 @@ public class JavaScriptFrameworkVersion {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "framework_id")
     private JavaScriptFramework framework;
 

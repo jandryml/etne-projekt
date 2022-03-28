@@ -1,6 +1,7 @@
 package com.etnetera.hr.controller;
 
 import com.etnetera.hr.dto.response.JavaScriptFrameworkVersionResponse;
+import com.etnetera.hr.exception.ResourceAlreadyExistsException;
 import com.etnetera.hr.exception.ResourceNotFoundException;
 import com.etnetera.hr.service.JavaScriptFrameworkService;
 import org.junit.jupiter.api.Test;
@@ -160,40 +161,14 @@ class JavaScriptFrameworkControllerTest {
     }
 
     @Test
-    public void save_OK() throws Exception {
+    public void create_OK() throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder().build();
-
-        when(javaScriptFrameworkService.update(any())).thenReturn(
-                getJavaScriptFrameworkWithVersionsResponseBuilder().build()
-        );
-
-        mvc.perform(put("/frameworks")
-                        .content(toJsonString(requestData))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Super framework"))
-                .andExpect(jsonPath("$.versions.length()").value(1))
-                .andExpect(jsonPath("$.versions[0].version").value("2.0.1"))
-                .andExpect(jsonPath("$.versions[0].deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
-                .andExpect(jsonPath("$.versions[0].hypeLevel").value(8));
-
-        verify(javaScriptFrameworkService, times(0)).create(any());
-        verify(javaScriptFrameworkService, times(1)).update(any());
-    }
-
-    @Test
-    public void save_CREATED() throws Exception {
-        var requestData = getJavaScriptFrameworkPlainRequestBuilder().build();
-
-        doThrow(new ResourceNotFoundException("JS framework not found!"))
-                .when(javaScriptFrameworkService).update(any());
 
         when(javaScriptFrameworkService.create(any())).thenReturn(
                 getJavaScriptFrameworkWithVersionsResponseBuilder().build()
         );
 
-        mvc.perform(put("/frameworks")
+        mvc.perform(post("/frameworks")
                         .content(toJsonString(requestData))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -205,17 +180,30 @@ class JavaScriptFrameworkControllerTest {
                 .andExpect(jsonPath("$.versions[0].hypeLevel").value(8));
 
         verify(javaScriptFrameworkService, times(1)).create(any());
-        verify(javaScriptFrameworkService, times(1)).update(any());
+    }
+
+    @Test
+    public void create_Conflict() throws Exception {
+        var requestData = getJavaScriptFrameworkPlainRequestBuilder().build();
+
+        doThrow(new ResourceAlreadyExistsException("JS framework already exists found!"))
+                .when(javaScriptFrameworkService).create(any());
+
+        mvc.perform(post("/frameworks")
+                        .content(toJsonString(requestData))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "Name definitely longer than 15 characters"})
-    public void save_NotValidName(String name) throws Exception {
+    public void create_NotValidName(String name) throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .name(name)
                 .build();
 
-        mvc.perform(put("/frameworks")
+        mvc.perform(post("/frameworks")
                         .content(toJsonString(requestData))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -224,12 +212,12 @@ class JavaScriptFrameworkControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"56", "xxx", "1.0", "1..0", "best version"})
-    public void save_NotValidVersion(String version) throws Exception {
+    public void create_NotValidVersion(String version) throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .version(version)
                 .build();
 
-        mvc.perform(put("/frameworks")
+        mvc.perform(post("/frameworks")
                         .content(toJsonString(requestData))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -237,12 +225,12 @@ class JavaScriptFrameworkControllerTest {
     }
 
     @Test
-    public void save_NotValidDeprecationDate() throws Exception {
+    public void create_NotValidDeprecationDate() throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .deprecationDate(null)
                 .build();
 
-        mvc.perform(put("/frameworks")
+        mvc.perform(post("/frameworks")
                         .content(toJsonString(requestData))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -251,12 +239,12 @@ class JavaScriptFrameworkControllerTest {
 
     @ParameterizedTest
     @ValueSource(ints = {-1, 0, 11, 42, 666})
-    public void save_NotValidHypeLevel(int hypeLevel) throws Exception {
+    public void create_NotValidHypeLevel(int hypeLevel) throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .hypeLevel(hypeLevel)
                 .build();
 
-        mvc.perform(put("/frameworks")
+        mvc.perform(post("/frameworks")
                         .content(toJsonString(requestData))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

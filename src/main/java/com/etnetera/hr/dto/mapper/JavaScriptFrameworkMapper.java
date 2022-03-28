@@ -18,6 +18,7 @@ public interface JavaScriptFrameworkMapper {
 
     default JavaScriptFrameworkPlainResponse toJavaScriptFrameworkPlainResponse(JavaScriptFrameworkVersion frameworkVersion) {
         return JavaScriptFrameworkPlainResponse.builder()
+                .id(frameworkVersion.getId())
                 .name(frameworkVersion.getFramework().getName())
                 .version(frameworkVersion.getVersion())
                 .deprecationDate(frameworkVersion.getDeprecationDate().toString())
