@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Simple REST controller for accessing application logic.
@@ -27,7 +28,7 @@ public class JavaScriptFrameworkController {
     private final JavaScriptFrameworkService javaScriptFrameworkService;
 
     @GetMapping
-    public Iterable<JavaScriptFrameworkWithVersionsResponse> findAll() {
+    public List<JavaScriptFrameworkWithVersionsResponse> findAll() {
         return javaScriptFrameworkService.findAll();
     }
 
@@ -42,9 +43,8 @@ public class JavaScriptFrameworkController {
     }
 
     @PutMapping
-    public ResponseEntity<JavaScriptFrameworkPlainResponse> save(
-            @Valid @RequestBody JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
-        JavaScriptFrameworkPlainResponse result;
+    public ResponseEntity<JavaScriptFrameworkWithVersionsResponse> save(@Valid @RequestBody JavaScriptFrameworkPlainRequest javaScriptFrameworkPlainRequest) {
+        JavaScriptFrameworkWithVersionsResponse result;
         HttpStatus httpStatus;
         try {
             result = javaScriptFrameworkService.update(javaScriptFrameworkPlainRequest);
@@ -57,7 +57,7 @@ public class JavaScriptFrameworkController {
     }
 
     @PatchMapping("/{name}/{version}")
-    public JavaScriptFrameworkPlainResponse updateDeprecationDateAndHypeLevel(
+    public JavaScriptFrameworkWithVersionsResponse updateDeprecationDateAndHypeLevel(
             @PathVariable String name,
             @PathVariable String version,
             @Valid @RequestBody JavaScriptFrameworkDataPatchRequest javaScriptFrameworkDataPatchRequest) {

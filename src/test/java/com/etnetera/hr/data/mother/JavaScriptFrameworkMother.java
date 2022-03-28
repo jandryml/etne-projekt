@@ -11,10 +11,10 @@ import com.etnetera.hr.dto.response.JavaScriptFrameworkWithVersionsResponse;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.etnetera.hr.dto.request.JavaScriptFrameworkDataPatchRequest.JavaScriptFrameworkDataPatchRequestBuilder;
+import static com.etnetera.hr.dto.request.JavaScriptFrameworkPlainRequest.JavaScriptFrameworkPlainRequestBuilder;
 import static com.etnetera.hr.dto.response.JavaScriptFrameworkPlainResponse.JavaScriptFrameworkPlainResponseBuilder;
 import static com.etnetera.hr.dto.response.JavaScriptFrameworkWithVersionsResponse.JavaScriptFrameworkWithVersionsResponseBuilder;
-import static com.etnetera.hr.dto.request.JavaScriptFrameworkPlainRequest.JavaScriptFrameworkPlainRequestBuilder;
-import static com.etnetera.hr.dto.request.JavaScriptFrameworkDataPatchRequest.JavaScriptFrameworkDataPatchRequestBuilder;
 
 public class JavaScriptFrameworkMother {
 
@@ -45,7 +45,6 @@ public class JavaScriptFrameworkMother {
 
     public static JavaScriptFrameworkWithVersionsResponseBuilder getJavaScriptFrameworkWithVersionsResponseBuilder() {
         List<JavaScriptFrameworkVersionResponse> versions = List.of(
-                new JavaScriptFrameworkVersionResponse("1.0.1", LocalDate.of(2020, 1, 1).toString(), 3),
                 new JavaScriptFrameworkVersionResponse("2.0.1", LocalDate.of(2025, 1, 1).toString(), 8));
         return JavaScriptFrameworkWithVersionsResponse.builder()
                 .name("Super framework")
@@ -70,5 +69,18 @@ public class JavaScriptFrameworkMother {
         );
 
         return javaScriptFramework.setVersions(versions);
+    }
+
+    public static JavaScriptFrameworkVersion getJavaScriptFrameworkVersion() {
+        JavaScriptFrameworkVersion javaScriptFrameworkVersion = new JavaScriptFrameworkVersion()
+                .setVersion("2.0.1")
+                .setDeprecationDate(LocalDate.of(2025, 1, 1))
+                .setHypeLevel(8);
+
+        JavaScriptFramework javaScriptFramework = new JavaScriptFramework()
+                .setName("Super framework")
+                .setVersions(List.of(javaScriptFrameworkVersion));
+
+        return javaScriptFrameworkVersion.setFramework(javaScriptFramework);
     }
 }

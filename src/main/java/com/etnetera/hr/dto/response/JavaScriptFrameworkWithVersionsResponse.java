@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Builder
 public class JavaScriptFrameworkWithVersionsResponse {
+    private final Long id;
     private final String name;
     private final List<JavaScriptFrameworkVersionResponse> versions;
 }

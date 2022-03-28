@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +26,8 @@ public class JavaScriptFramework {
 	@Column(nullable = false, length = 30)
 	private String name;
 
-	@OneToMany(mappedBy = "framework")
-	private List<JavaScriptFrameworkVersion> versions;
+	@OneToMany(mappedBy = "framework"/*, cascade = CascadeType.ALL*/)
+	private List<JavaScriptFrameworkVersion> versions = new ArrayList<>();
 
 	@Override
 	public String toString() {

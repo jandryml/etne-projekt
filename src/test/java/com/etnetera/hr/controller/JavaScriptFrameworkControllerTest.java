@@ -49,7 +49,7 @@ class JavaScriptFrameworkControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$.[0].name").value("Super framework"))
-                .andExpect(jsonPath("$.[0].versions.length()").value(2))
+                .andExpect(jsonPath("$.[0].versions.length()").value(1))
                 .andExpect(jsonPath("$.[1].name").value("Bad framework"))
                 .andExpect(jsonPath("$.[1].versions.length()").value(1));
 
@@ -68,7 +68,7 @@ class JavaScriptFrameworkControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$.[0].name").value("Super framework"))
-                .andExpect(jsonPath("$.[0].versions.length()").value(2));
+                .andExpect(jsonPath("$.[0].versions.length()").value(1));
 
         verify(javaScriptFrameworkService, times(1)).findAll();
     }
@@ -99,13 +99,10 @@ class JavaScriptFrameworkControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(frameworkName))
-                .andExpect(jsonPath("$.versions.length()").value(2))
-                .andExpect(jsonPath("$.versions.[0].version").value("1.0.1"))
-                .andExpect(jsonPath("$.versions.[0].deprecationDate").value(LocalDate.of(2020, 1, 1).toString()))
-                .andExpect(jsonPath("$.versions.[0].hypeLevel").value(3))
-                .andExpect(jsonPath("$.versions.[1].version").value("2.0.1"))
-                .andExpect(jsonPath("$.versions.[1].deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
-                .andExpect(jsonPath("$.versions.[1].hypeLevel").value(8));
+                .andExpect(jsonPath("$.versions.length()").value(1))
+                .andExpect(jsonPath("$.versions.[0].version").value("2.0.1"))
+                .andExpect(jsonPath("$.versions.[0].deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
+                .andExpect(jsonPath("$.versions.[0].hypeLevel").value(8));
 
         verify(javaScriptFrameworkService, times(1)).findByName(frameworkName);
     }
@@ -167,7 +164,7 @@ class JavaScriptFrameworkControllerTest {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder().build();
 
         when(javaScriptFrameworkService.update(any())).thenReturn(
-                getJavaScriptFrameworkPlainResponseBuilder().build()
+                getJavaScriptFrameworkWithVersionsResponseBuilder().build()
         );
 
         mvc.perform(put("/frameworks")
@@ -176,9 +173,10 @@ class JavaScriptFrameworkControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Super framework"))
-                .andExpect(jsonPath("$.version").value("2.0.1"))
-                .andExpect(jsonPath("$.deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
-                .andExpect(jsonPath("$.hypeLevel").value(8));
+                .andExpect(jsonPath("$.versions.length()").value(1))
+                .andExpect(jsonPath("$.versions[0].version").value("2.0.1"))
+                .andExpect(jsonPath("$.versions[0].deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
+                .andExpect(jsonPath("$.versions[0].hypeLevel").value(8));
 
         verify(javaScriptFrameworkService, times(0)).create(any());
         verify(javaScriptFrameworkService, times(1)).update(any());
@@ -192,7 +190,7 @@ class JavaScriptFrameworkControllerTest {
                 .when(javaScriptFrameworkService).update(any());
 
         when(javaScriptFrameworkService.create(any())).thenReturn(
-                getJavaScriptFrameworkPlainResponseBuilder().build()
+                getJavaScriptFrameworkWithVersionsResponseBuilder().build()
         );
 
         mvc.perform(put("/frameworks")
@@ -201,16 +199,17 @@ class JavaScriptFrameworkControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Super framework"))
-                .andExpect(jsonPath("$.version").value("2.0.1"))
-                .andExpect(jsonPath("$.deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
-                .andExpect(jsonPath("$.hypeLevel").value(8));
+                .andExpect(jsonPath("$.versions.length()").value(1))
+                .andExpect(jsonPath("$.versions[0].version").value("2.0.1"))
+                .andExpect(jsonPath("$.versions[0].deprecationDate").value(LocalDate.of(2025, 1, 1).toString()))
+                .andExpect(jsonPath("$.versions[0].hypeLevel").value(8));
 
         verify(javaScriptFrameworkService, times(1)).create(any());
         verify(javaScriptFrameworkService, times(1)).update(any());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "Name definitely longer than 15 characters" })
+    @ValueSource(strings = {"", "Name definitely longer than 15 characters"})
     public void save_NotValidName(String name) throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .name(name)
@@ -224,7 +223,7 @@ class JavaScriptFrameworkControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"56", "xxx", "1.0", "1..0","best version" })
+    @ValueSource(strings = {"56", "xxx", "1.0", "1..0", "best version"})
     public void save_NotValidVersion(String version) throws Exception {
         var requestData = getJavaScriptFrameworkPlainRequestBuilder()
                 .version(version)
@@ -272,9 +271,7 @@ class JavaScriptFrameworkControllerTest {
         var requestData = getJavaScriptFrameworkDataPatchRequestBuilder().build();
 
         when(javaScriptFrameworkService.updateDeprecationDateAndHypeLevel(eq(frameworkName), eq(frameworkVersion), any())).thenReturn(
-                getJavaScriptFrameworkPlainResponseBuilder()
-                        .deprecationDate(LocalDate.of(2026, 1, 1).toString())
-                        .hypeLevel(7)
+                getJavaScriptFrameworkWithVersionsResponseBuilder()
                         .build()
         );
 
@@ -284,9 +281,7 @@ class JavaScriptFrameworkControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Super framework"))
-                .andExpect(jsonPath("$.version").value("2.0.1"))
-                .andExpect(jsonPath("$.deprecationDate").value(LocalDate.of(2026, 1, 1).toString()))
-                .andExpect(jsonPath("$.hypeLevel").value(7));
+                .andExpect(jsonPath("$.versions.length()").value(1));
 
         verify(javaScriptFrameworkService, times(1)).updateDeprecationDateAndHypeLevel(eq(frameworkName), eq(frameworkVersion), any());
     }
@@ -378,7 +373,7 @@ class JavaScriptFrameworkControllerTest {
         final String frameworkVersion = "2.0.1";
 
         doThrow(new ResourceNotFoundException("Sensor not found!"))
-                .when(javaScriptFrameworkService).deleteByNameAndVersion(frameworkName,frameworkVersion);
+                .when(javaScriptFrameworkService).deleteByNameAndVersion(frameworkName, frameworkVersion);
 
         mvc.perform(delete("/frameworks/{name}/{version}", frameworkName, frameworkVersion))
                 .andExpect(status().isNotFound());
